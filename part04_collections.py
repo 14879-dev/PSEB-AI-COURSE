@@ -97,3 +97,21 @@ for student, marks in result_sheet.items():
     average=total/len(marks)
 
     print(f"\nStudent: {student}")
+    print(f"Marks: {marks}")
+    print(f"Total: {total}")
+    print(f"Average: {average:.2f}")
+
+    #find the topper
+    if total>highest_total:
+        highest_total=total
+        topper=student
+
+    #check if any subject marks are below 40
+    if any(mark<40 for mark in marks):
+        below_40.add(student)
+
+#display the topper
+print("\n===============Topper================")
+print (f"Topper: {topper} with total marks: {highest_total}")
+
+      
