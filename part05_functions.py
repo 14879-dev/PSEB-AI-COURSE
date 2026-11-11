@@ -1,38 +1,30 @@
-
 # Name: Mudassir Munir
 # PSEB ID: PSEB-2026-010784
-# Date: 07-11-2026
+# Date: 11-11-2026
 
 # ==========================================
 # PART 5: FUNCTIONS & COMPREHENSIONS
-
-
-
+# PART 11 WARM-UP: TYPE HINTS
 # ==========================================
-# WARM-UP:
-
 
 print("\n========== WARM-UP ==========")
 
-# Function to calculate area of a circle
-def area_of_circle(r):
+
+def area_of_circle(r: float) -> float:
     return 3.14159 * r * r
 
 
-# Function to check whether a number is even
-def is_even(n):
+def is_even(n: int) -> bool:
     return n % 2 == 0
 
 
-# Function to greet in English or Urdu
-def greet(name, lang="en"):
+def greet(name: str, lang: str = "en") -> str:
     if lang == "en":
         return f"Hello {name}!"
     elif lang == "ur":
         return f"Salaam {name}!"
+    return f"Hello {name}!"
 
-
-# Calling each function 3 times
 
 print("\nArea of Circle:")
 print(area_of_circle(5))
@@ -56,13 +48,12 @@ print(greet("Ahmed"))
 
 print("\n========== STUDENT REPORT ==========")
 
-# Function to calculate average marks
-def average(marks):
+
+def average(marks: list[int]) -> float:
     return sum(marks) / len(marks)
 
 
-# Function to calculate grade
-def grade(marks):
+def grade(marks: list[int]) -> str:
     avg = average(marks)
 
     if avg < 0 or avg > 100:
@@ -79,22 +70,19 @@ def grade(marks):
         return "Fail"
 
 
-# Function to generate student report
-def report(name, marks):
+def report(name: str, marks: list[int]) -> str:
     avg = average(marks)
     student_grade = grade(marks)
 
     return f"{name} | Average: {avg:.2f} | Grade: {student_grade}"
 
 
-# Three students
-students = [
+students: list[tuple[str, list[int]]] = [
     ("Mudassir", [85, 90, 88]),
     ("Ali", [70, 75, 72]),
     ("Ahmed", [45, 50, 40])
 ]
 
-# Generate reports
 for name, marks in students:
     print(report(name, marks))
 
@@ -105,34 +93,28 @@ for name, marks in students:
 
 print("\n========== CHALLENGE ==========")
 
-# 1. List comprehension: Squares from 1 to 10
-
-squares = [number ** 2 for number in range(1, 11)]
+squares: list[int] = [number ** 2 for number in range(1, 11)]
 
 print("\nSquares from 1 to 10:")
 print(squares)
 
 
-# 2. List comprehension: Names with more than 4 letters
+names: list[str] = ["Ali", "Ahmed", "Mudassir", "Sara", "Usman", "Ayesha"]
 
-names = ["Ali", "Ahmed", "Mudassir", "Sara", "Usman", "Ayesha"]
-
-long_names = [name for name in names if len(name) > 4]
+long_names: list[str] = [name for name in names if len(name) > 4]
 
 print("\nNames with more than 4 letters:")
 print(long_names)
 
 
-# 3. Dictionary comprehension: Student averages
-
-student_marks = {
+student_marks: dict[str, list[int]] = {
     "Mudassir": [85, 90, 88],
     "Ali": [70, 75, 72],
     "Ahmed": [45, 50, 40],
     "Usman": [25, 30, 35]
 }
 
-student_averages = {
+student_averages: dict[str, float] = {
     name: average(marks)
     for name, marks in student_marks.items()
 }
@@ -141,9 +123,7 @@ print("\nStudent Averages:")
 print(student_averages)
 
 
-# 4. List comprehension: Passing students (average >= 33)
-
-passing_students = [
+passing_students: list[str] = [
     name
     for name, avg in student_averages.items()
     if avg >= 33
