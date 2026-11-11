@@ -3,6 +3,8 @@
 # PSEB ID: PSEB-2026-010784
 # Date: 11-11-2026
 
+import logging
+
 from school.student import Student
 from school.grades import report_card
 from school.storage import save_students, load_students
@@ -18,12 +20,14 @@ def add_student(students: list[Student]) -> None:
 
     if any(student.roll_number == roll_number for student in students):
         print("A student with this roll number already exists.")
+        logging.warning("Duplicate roll number attempted: %s", roll_number)
         return
 
     student = Student(name, roll_number)
     students.append(student)
 
     print(f"Student {name} added successfully!")
+    logging.info("Student added: %s, Roll: %s", name, roll_number)
 
 
 def find_student(
@@ -44,15 +48,24 @@ def add_marks(students: list[Student]) -> None:
 
     if student is None:
         print("Student not found.")
+        logging.warning("Marks entry attempted for unknown roll: %s", roll_number)
         return
 
     try:
         mark = int(input("Enter marks (0-100): "))
         student.add_mark(mark)
+
         print("Marks added successfully!")
+
+        logging.info(
+            "Marks added: %s for student %s",
+            mark,
+            student.roll_number
+        )
 
     except ValueError as error:
         print(f"Invalid input: {error}")
+        logging.warning("Invalid marks input: %s", error)
 
 
 def show_report(students: list[Student]) -> None:
@@ -65,6 +78,7 @@ def show_report(students: list[Student]) -> None:
         return
 
     print(report_card(student))
+    logging.info("Report card viewed for roll: %s", roll_number)
 
 
 def class_ranking(students: list[Student]) -> None:
@@ -88,15 +102,24 @@ def class_ranking(students: list[Student]) -> None:
         )
 
     print("===================================")
+    logging.info("Class ranking displayed.")
 
 
 def main() -> None:
+    logging.basicConfig(
+        filename="school_manager.log",
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
     try:
         students: list[Student] = load_students()
         print(f"Loaded {len(students)} student(s).")
+        logging.info("Loaded %s student records.", len(students))
 
     except (OSError, ValueError) as error:
         print(f"Could not load student data: {error}")
+        logging.exception("Failed to load student data.")
         students = []
 
     while True:
@@ -107,33 +130,49 @@ def main() -> None:
         print("4. Class ranking")
         print("5. Save and exit")
 
-        choice = input("Choose: ").strip()
+        try:
+            choice = input("Choose: ").strip()
 
-        if choice == "1":
-            add_student(students)
+            if choice == "1":
+                add_student(students)
 
-        elif choice == "2":
-            add_marks(students)
+            elif choice == "2":
+                add_marks(students)
 
-        elif choice == "3":
-            show_report(students)
+            elif choice == "3":
+                show_report(students)
 
-        elif choice == "4":
-            class_ranking(students)
+            elif choice == "4":
+                class_ranking(students)
 
-        elif choice == "5":
+            elif choice == "5":
+                try:
+                    save_students(students)
+                    print("Student data saved successfully!")
+                    logging.info("Student data saved successfully.")
+
+                except OSError as error:
+                    print(f"Could not save student data: {error}")
+                    logging.exception("Failed to save student data.")
+
+                print("Exiting School Manager...")
+                break
+
+            else:
+                print("Invalid choice. Please select 1-5.")
+                logging.warning("Invalid menu choice: %s", choice)
+
+        except (EOFError, KeyboardInterrupt):
+            print("\nExiting School Manager...")
+
             try:
                 save_students(students)
-                print("Student data saved successfully!")
+                logging.info("Student data saved during interruption.")
 
-            except OSError as error:
-                print(f"Could not save student data: {error}")
+            except OSError:
+                logging.exception("Failed to save data during interruption.")
 
-            print("Exiting School Manager...")
             break
-
-        else:
-            print("Invalid choice. Please select 1-5.")
 
 
 if __name__ == "__main__":
